@@ -40,7 +40,7 @@ void setup() {
 void loop() {
 
     strip.setPixelColor(head, color); // Sets head pixel to color
-    strip.setPixelColor(tail, 0);     // Sets tail pixel to OFF
+    strip.setPixelColor(tail, color);     // Sets tail pixel to OFF
     strip.show();                     // Update strip
 
     pot = analogRead(ANALOGPOTPIN); // Reads the potentiometer
