@@ -14,7 +14,6 @@
 #define DATAPIN 6	  // Green wire
 #define CLOCKPIN 5	 // Blue wire
 #define ANALOGPOTPIN 2 // Potentiometer pin
-#define COLORSTEP 1	// How much the color changes
 
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
@@ -37,65 +36,37 @@ void setup()
 	strip.show(); // Clears the strip
 }
 
+#define COLORSTEP 1	// How much the color changes
 
-#define REALCOLORSTEP 5
+int r = 255;
+int g = 0;
+int b = 0;
 
-void loop()
-{
 
-	for (int red = 0; red <= 255; red += REALCOLORSTEP)
-	{
-		for (int green = 0; green <= 255; green += REALCOLORSTEP)
-		{
-			for (int blue = 0; blue <= 255; blue += REALCOLORSTEP)
-			{
+void loop() {
+    while (true) {
 
-				//color = (blue + 1) * (green + 1) * (red + 1);
-				//color = 0xFF0000;
-
-				for (int currentPixel = 0; currentPixel <= NUMPIXELS; currentPixel++)
-				{
-					strip.setPixelColor(currentPixel, red, green, blue); // Sets head pixel to color
-																		 //strip.setPixelColor(tail, color); // Sets head pixel to color
-																		 //strip.setPixelColor(11, color); // Sets tail pixel to OFF
-																		 //strip.setPixelColor(14, 0x00FF00); // Sets tail pixel to OFF
-
-					// Update strip
-
-					// pot = analogRead(ANALOGPOTPIN); // Reads the potentiometer
-
-					// pot = map(pot, 0, 1023, 0, 100); // Maps the reading to (0 - 100)
-					// delay(pot);						 // Delays for that many miliseconds
-
-					// if (++head >= NUMPIXELS) {
-
-					// 	head = 0;
-
-					// 	// if ((color >>= COLORSTEP) == 0) {
-					// 	// 	color = 0xFF0000;
-					// 	// }
-					// }
-
-					// // Resets the head position to 0
-					// if (++tail >= NUMPIXELS) {
-					// 	tail = 0;
-					// }
-				}
-
-				strip.show();
-			}
+        // Update the intensity value
+        if (r > 0 && b == 0){
+			r--;
+			g++;
 		}
-	}
+		if (g > 0 && r == 0){
+			g--;
+			b++;
+		}
+		if (b > 0 && g == 0){
+			r++;
+			b--;
+		}
+
+        // Set the color
+		for (int currentPix = 0; currentPix <= NUMPIXELS; currentPix++) {
+        	strip.setPixelColor(currentPix, r, g, b);
+		}
+		strip.show();
+
+        // Wait
+        //delay(50);     
+    }
 }
-
-// TEST AND IMPLEMENT ME
-
-// const int step = 8; // Select this to be a power of two if you want the maximum brightness to be reachable
-// for( int red = 0x00; red <= 0xFF; red += step ) {
-//     for( int green = 0x00; green <= 0xFF; green += step ) {
-//         for( int blue = 0x00; blue <= 0xFF; blue += step ) {
-//             const int color = blue << 16 + green << 8 + red;
-//             // Change the led settings here.
-//         }
-//     }
-// }
