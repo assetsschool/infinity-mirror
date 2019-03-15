@@ -48,25 +48,22 @@ void loop() {
 
         // Update the intensity value
         if (r > 0 && b == 0){
-			r--;
-			g++;
+			r = r - COLORSTEP;
+			g = g + COLORSTEP;
 		}
 		if (g > 0 && r == 0){
-			g--;
-			b++;
+			g = g - COLORSTEP;
+			b = b + COLORSTEP;
 		}
 		if (b > 0 && g == 0){
-			r++;
-			b--;
+			r = r + COLORSTEP;
+			b = b - COLORSTEP;
 		}
 
         // Set the color
 		for (int currentPix = 0; currentPix <= NUMPIXELS; currentPix++) {
         	strip.setPixelColor(currentPix, r, g, b);
 		}
-		strip.show();
-
-        // Wait
-        //delay(50);     
+		strip.show();    
     }
 }
