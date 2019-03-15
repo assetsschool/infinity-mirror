@@ -9,60 +9,84 @@
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
 
-
 // Compile time definitions
-#define NUMPIXELS 144 // Pixel count
-#define DATAPIN 6 // Green wire
-#define CLOCKPIN 5 // Blue wire
+#define NUMPIXELS 144  // Pixel count
+#define DATAPIN 6	  // Green wire
+#define CLOCKPIN 5	 // Blue wire
 #define ANALOGPOTPIN 2 // Potentiometer pin
-#define COLORSTEP 8 // How much the color changes
+#define COLORSTEP 1	// How much the color changes
 
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
 int head = 0;
-int tail = -143;
+int tail = -144;
 
 uint32_t color = 0xFF0000; // Color (starts red)
 
 int pot = 0; // Potentiometer variable
 
-
-void setup() {
+void setup()
+{
 
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
-    clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
+	clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
 #endif
 
-    strip.begin();
-    strip.show(); // Clears the strip
+	strip.begin();
+	strip.setBrightness(64);
+	strip.show(); // Clears the strip
 }
 
-void loop() {
 
-    strip.setPixelColor(head, color); // Sets head pixel to color
-    strip.setPixelColor(tail, color);     // Sets tail pixel to OFF
-    strip.show();                     // Update strip
+#define REALCOLORSTEP 5
 
-    pot = analogRead(ANALOGPOTPIN); // Reads the potentiometer
+void loop()
+{
 
-    pot = map(pot, 0, 1023, 0, 100); // Maps the reading to (0 - 100)
-    delay(pot); // Delays for that many miliseconds
+	for (int red = 0; red <= 255; red += REALCOLORSTEP)
+	{
+		for (int green = 0; green <= 255; green += REALCOLORSTEP)
+		{
+			for (int blue = 0; blue <= 255; blue += REALCOLORSTEP)
+			{
 
-    if (++head >= NUMPIXELS) {
+				//color = (blue + 1) * (green + 1) * (red + 1);
+				//color = 0xFF0000;
 
-        head = 0;
+				for (int currentPixel = 0; currentPixel <= NUMPIXELS; currentPixel++)
+				{
+					strip.setPixelColor(currentPixel, red, green, blue); // Sets head pixel to color
+																		 //strip.setPixelColor(tail, color); // Sets head pixel to color
+																		 //strip.setPixelColor(11, color); // Sets tail pixel to OFF
+																		 //strip.setPixelColor(14, 0x00FF00); // Sets tail pixel to OFF
 
-        if ((color >>= COLORSTEP) == 0) {
-            color = 0xFF0000;
-        }
-    }
+					// Update strip
 
-    // Resets the head position to 0
-    if (++tail >= NUMPIXELS) {
-        tail = 0;
-    }
+					// pot = analogRead(ANALOGPOTPIN); // Reads the potentiometer
+
+					// pot = map(pot, 0, 1023, 0, 100); // Maps the reading to (0 - 100)
+					// delay(pot);						 // Delays for that many miliseconds
+
+					// if (++head >= NUMPIXELS) {
+
+					// 	head = 0;
+
+					// 	// if ((color >>= COLORSTEP) == 0) {
+					// 	// 	color = 0xFF0000;
+					// 	// }
+					// }
+
+					// // Resets the head position to 0
+					// if (++tail >= NUMPIXELS) {
+					// 	tail = 0;
+					// }
+				}
+
+				strip.show();
+			}
+		}
+	}
 }
-
 
 // TEST AND IMPLEMENT ME
 
@@ -74,4 +98,4 @@ void loop() {
 //             // Change the led settings here.
 //         }
 //     }
-// } 
+// }
