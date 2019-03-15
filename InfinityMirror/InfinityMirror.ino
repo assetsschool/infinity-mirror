@@ -36,34 +36,51 @@ void setup()
 	strip.show(); // Clears the strip
 }
 
-#define COLORSTEP 1	// How much the color changes
+void loop()
+{
+	rainbowCycle();
+}
 
-int r = 255;
-int g = 0;
-int b = 0;
+void rainbowCycle()
+{
+	byte *c;
+	uint16_t i, j;
 
-
-void loop() {
-    while (true) {
-
-        // Update the intensity value
-        if (r > 0 && b == 0){
-			r = r - COLORSTEP;
-			g = g + COLORSTEP;
+	for (j = 0; j < 256 * 5; j++)
+	{
+		for (i = 0; i < NUMPIXELS; i++)
+		{
+			c = Wheel(((i * 256 / NUMPIXELS) + j) & 255);
+			strip.setPixelColor(i, *c, *(c + 1), *(c + 2));
 		}
-		if (g > 0 && r == 0){
-			g = g - COLORSTEP;
-			b = b + COLORSTEP;
-		}
-		if (b > 0 && g == 0){
-			r = r + COLORSTEP;
-			b = b - COLORSTEP;
-		}
+		strip.show();
+	}
+}
 
-        // Set the color
-		for (int currentPix = 0; currentPix <= NUMPIXELS; currentPix++) {
-        	strip.setPixelColor(currentPix, r, g, b);
-		}
-		strip.show();    
-    }
+byte *Wheel(byte WheelPos)
+{
+	static byte c[3];
+
+	if (WheelPos < 85)
+	{
+		c[0] = WheelPos * 3;
+		c[1] = 255 - WheelPos * 3;
+		c[2] = 0;
+	}
+	else if (WheelPos < 170)
+	{
+		WheelPos -= 85;
+		c[0] = 255 - WheelPos * 3;
+		c[1] = 0;
+		c[2] = WheelPos * 3;
+	}
+	else
+	{
+		WheelPos -= 170;
+		c[0] = 0;
+		c[1] = WheelPos * 3;
+		c[2] = 255 - WheelPos * 3;
+	}
+
+	return c;
 }
