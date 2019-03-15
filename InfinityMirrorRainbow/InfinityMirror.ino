@@ -10,10 +10,11 @@
 #include <SPI.h>
 
 // Compile time definitions
-#define NUMPIXELS 286  // Pixel count
+#define NUMPIXELS 286  // Pixel count for extended LED strip
 #define DATAPIN 6	  // Green wire
 #define CLOCKPIN 5	 // Blue wire
 #define ANALOGPOTPIN 2 // Potentiometer pin
+#define BRIGHTNESS 64
 
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
@@ -32,7 +33,12 @@ void setup()
 #endif
 
 	strip.begin();
-	//strip.setBrightness(1);
+
+	if (BRIGHTNESS > 0)
+	{
+		strip.setBrightness(BRIGHTNESS);
+	}
+
 	strip.show(); // Clears the strip
 }
 
