@@ -1,8 +1,8 @@
 /*
- *  InfinityMirror.ino
+ *  InfinityMirrorRainbow.ino
  * 
  *  Created by Iain Moncrief
- *  Tuesday, March 12, 2019
+ *  Thursday, March 15, 2019
  *  
  */
 
