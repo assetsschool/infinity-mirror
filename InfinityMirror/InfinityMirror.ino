@@ -10,15 +10,16 @@
 #include <SPI.h>
 
 // Compile time definitions
-#define NUMPIXELS 286  // Pixel count
+#define NUMPIXELS 144  // Pixel count
 #define DATAPIN 6	  // Green wire
 #define CLOCKPIN 5	 // Blue wire
 #define ANALOGPOTPIN 2 // Potentiometer pin
+#define COLORSTEP 8	// How much the color changes
 
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
 int head = 0;
-int tail = -286;
+int tail = -143;
 
 uint32_t color = 0xFF0000; // Color (starts red)
 
@@ -32,55 +33,35 @@ void setup()
 #endif
 
 	strip.begin();
-	//strip.setBrightness(1);
 	strip.show(); // Clears the strip
 }
 
 void loop()
 {
-	rainbowCycle();
-}
 
-void rainbowCycle()
-{
-	byte *c;
-	uint16_t i, j;
+	strip.setPixelColor(head, color); // Sets head pixel to color
+	strip.setPixelColor(tail, color); // Sets tail pixel to OFF
+	strip.show();					  // Update strip
 
-	for (j = 0; j < 256 * 5; j++)
+	pot = analogRead(ANALOGPOTPIN); // Reads the potentiometer
+
+	pot = map(pot, 0, 1023, 0, 100); // Maps the reading to (0 - 100)
+	delay(pot);						 // Delays for that many miliseconds
+
+	if (++head >= NUMPIXELS)
 	{
-		for (i = 0; i < NUMPIXELS; i++)
+
+		head = 0;
+
+		if ((color >>= COLORSTEP) == 0)
 		{
-			c = Wheel(((i * 256 / NUMPIXELS) + j) & 255);
-			strip.setPixelColor(i, *c, *(c + 1), *(c + 2));
+			color = 0xFF0000;
 		}
-		strip.show();
-	}
-}
-
-byte *Wheel(byte WheelPos)
-{
-	static byte c[3];
-
-	if (WheelPos < 85)
-	{
-		c[0] = WheelPos * 3;
-		c[1] = 255 - WheelPos * 3;
-		c[2] = 0;
-	}
-	else if (WheelPos < 170)
-	{
-		WheelPos -= 85;
-		c[0] = 255 - WheelPos * 3;
-		c[1] = 0;
-		c[2] = WheelPos * 3;
-	}
-	else
-	{
-		WheelPos -= 170;
-		c[0] = 0;
-		c[1] = WheelPos * 3;
-		c[2] = 255 - WheelPos * 3;
 	}
 
-	return c;
+	// Resets the head position to 0
+	if (++tail >= NUMPIXELS)
+	{
+		tail = 0;
+	}
 }
