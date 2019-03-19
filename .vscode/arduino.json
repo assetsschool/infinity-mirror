@@ -1,5 +1,6 @@
 {
     "programmer": "AVR ISP",
     "board": "arduino:avr:uno",
-    "sketch": "InfinityMirrorRainbow/InfinityMirrorRainbow.ino"
+    "sketch": "InfinityMirrorRainbow/InfinityMirrorRainbow.ino",
+    "port": "/dev/cu.usbmodem143101"
 }
