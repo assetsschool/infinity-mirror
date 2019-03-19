@@ -10,7 +10,6 @@
 #include <SPI.h>
 #include <EEPROM.h>
 
-
 // Compile time definitions
 #define NUMPIXELS 144  // Pixel count for extended LED strip
 #define DATAPIN 6	  // Green wire
@@ -727,10 +726,10 @@ void fadeToBlack(int ledNo, byte fadeValue) {
     
     strip.setPixelColor(ledNo, r,g,b);
  #endif
- #ifndef ADAFRUIT_NEOPIXEL_H
-   // FastLED
-   leds[ledNo].fadeToBlackBy( fadeValue );
- #endif  
+//  #ifndef ADAFRUIT_NEOPIXEL_H
+//    // FastLED
+//    leds[ledNo].fadeToBlackBy( fadeValue );
+//  #endif  
 }
 
 // *** REPLACE TO HERE ***
