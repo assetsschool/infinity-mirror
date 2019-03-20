@@ -1,6 +1,0 @@
-
-setAll(0,0,0); => strip.clear();
-showStrip(); => strip.show();
-setPixel(????); => strip.setPixelColor(????);
-
-

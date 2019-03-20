@@ -1,5 +1,5 @@
 /*
- *  InfinityMirrorRainbow.ino
+ *  AllModes.ino
  * 
  *  Created by Iain Moncrief
  *  Monday, March 18, 2019
@@ -15,8 +15,8 @@
 #define DATAPIN 6	  // Green wire
 #define CLOCKPIN 5	 // Blue wire
 #define ANALOGPOTPIN 2 // Potentiometer pin
-#define BRIGHTNESS 0
-#define BUTTON 2
+#define BRIGHTNESS 0   // 0 is MAX
+#define BUTTON 2	   // Button pin
 
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
@@ -41,7 +41,6 @@ void setup()
 	attachInterrupt(digitalPinToInterrupt(BUTTON), changeEffect, CHANGE); // pressed
 }
 
-// *** REPLACE FROM HERE ***
 void loop()
 {
 	EEPROM.get(0, selectedEffect);
@@ -51,7 +50,6 @@ void loop()
 		selectedEffect = 0;
 		EEPROM.put(0, 0);
 	}
-	//selectedEffect = 0;
 	switch (selectedEffect)
 	{
 
@@ -840,8 +838,7 @@ void meteorRain(byte red, byte green, byte blue, byte meteorSize, byte meteorTra
 // used by meteorrain
 void fadeToBlack(int ledNo, byte fadeValue)
 {
-#ifdef ADAFRUIT_NEOPIXEL_H
-	// NeoPixel
+	// Dotstar
 	uint32_t oldColor;
 	uint8_t r, g, b;
 	int value;
@@ -855,44 +852,19 @@ void fadeToBlack(int ledNo, byte fadeValue)
 	g = (g <= 10) ? 0 : (int)g - (g * fadeValue / 256);
 	b = (b <= 10) ? 0 : (int)b - (b * fadeValue / 256);
 
-	strip.setPixelColor(ledNo, r, g, b);
-#endif
-	//  #ifndef ADAFRUIT_NEOPIXEL_H
-	//    // FastLED
-	//    leds[ledNo].fadeToBlackBy( fadeValue );
-	//  #endif
+	setPixel(ledNo, r, g, b);
 }
-
-// *** REPLACE TO HERE ***
-
-// ***************************************
-// ** FastLed/NeoPixel Common Functions **
-// ***************************************
 
 // Apply LED color changes
 void showStrip()
 {
-	// NeoPixel
 	strip.show();
-	//  #ifndef ADAFRUIT_NEOPIXEL_H
-	//    // FastLED
-	//    FastLED.show();
-	//  #endif
 }
 
 // Set a LED color (not yet visible)
 void setPixel(int Pixel, byte red, byte green, byte blue)
 {
-	//  #ifdef ADAFRUIT_NEOPIXEL_H
-	// NeoPixel
 	strip.setPixelColor(Pixel, strip.Color(red, green, blue));
-	//  #endif
-	//  #ifndef ADAFRUIT_NEOPIXEL_H
-	//    // FastLED
-	//    leds[Pixel].r = red;
-	//    leds[Pixel].g = green;
-	//    leds[Pixel].b = blue;
-	//  #endif
 }
 
 // Set all LEDs to a given color and apply it (visible)
@@ -900,7 +872,7 @@ void setAll(byte red, byte green, byte blue)
 {
 	for (int i = 0; i < NUMPIXELS; i++)
 	{
-		strip.setPixelColor(i, red, green, blue);
+		setPixel(i, red, green, blue);
 	}
 	strip.show();
 }

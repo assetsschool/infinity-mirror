@@ -10,7 +10,7 @@
 #include <SPI.h>
 
 // Compile time definitions
-#define NUMPIXELS 286  // Pixel count for extended LED strip
+#define NUMPIXELS 144  // Pixel count for extended LED strip
 #define DATAPIN 6	  // Green wire
 #define CLOCKPIN 5	 // Blue wire
 #define ANALOGPOTPIN 2 // Potentiometer pin
