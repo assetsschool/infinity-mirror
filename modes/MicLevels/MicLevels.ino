@@ -1,8 +1,8 @@
 /*
- *  InfinityMirrorRainbow.ino
+ *  MicLevels.ino
  * 
  *  Created by Iain Moncrief
- *  Thursday, March 15, 2019
+ *  Wednesday, March 20, 2019
  *  
  */
 
@@ -11,8 +11,8 @@
 
 // Compile time definitions
 #define NUMPIXELS 144 // Pixel count for extended LED strip
-#define DATAPIN 6     // Green wire
-#define CLOCKPIN 5    // Blue wire
+#define DATAPIN 6	 // Green wire
+#define CLOCKPIN 5	// Blue wire
 #define MICPIN 0
 
 #define BRIGHTNESS 25
@@ -32,79 +32,80 @@ void setup()
 {
 
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
-    clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
+	clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
 #endif
 
-    strip.begin();
+	strip.begin();
 
-    if (BRIGHTNESS > 0)
-    {
-        strip.setBrightness(BRIGHTNESS);
-    }
+	if (BRIGHTNESS > 0)
+	{
+		strip.setBrightness(BRIGHTNESS);
+	}
 
-    strip.show(); // Clears the strip
+	strip.show(); // Clears the strip
 }
 
 void loop()
 {
 
-    unsigned long startMillis = millis(); // Start of sample window
-    unsigned int peakToPeak = 0;          // peak-to-peak level
+	unsigned long startMillis = millis(); // Start of sample window
+	unsigned int peakToPeak = 0; // peak-to-peak level
 
-    unsigned int signalMax = 0;
-    unsigned int signalMin = 1024;
+	unsigned int signalMax = 0;
+	unsigned int signalMin = 1024;
 
-    // collect data for 50 mS
-    while (millis() - startMillis < sampleWindow)
-    {
-        sample = analogRead(0);
-        if (sample < 1024) // toss out spurious readings
-        {
-            if (sample > signalMax)
-            {
-                signalMax = sample; // save just the max levels
-            }
-            else if (sample < signalMin)
-            {
-                signalMin = sample; // save just the min levels
-            }
-        }
-    }
-    peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
-                                        //double volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+	// collect data for 50 mS
+	while (millis() - startMillis < sampleWindow)
+	{
+		sample = analogRead(0);
+		if (sample < 1024) // toss out spurious readings
+		{
+			if (sample > signalMax)
+			{
+				signalMax = sample; // save just the max levels
+			}
+			else if (sample < signalMin)
+			{
+				signalMin = sample; // save just the min levels
+			}
+		}
+	}
 
-    micValue = map(peakToPeak, 0, 512, 0, NUMPIXELS);
+	// Gets amplitude change
+	peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude 
 
-    //micValue = map(analogRead(MICPIN), 0, 513, 0, NUMPIXELS);
+	micValue = map(peakToPeak, 0, 512, 0, NUMPIXELS); // Maps the value to the pixel length
 
-    for (int i = 0; i < NUMPIXELS; i++)
-    {
-        volumePercentage = map(i, 0, NUMPIXELS, 0, 100);
-        if (i < micValue)
-        {
-            if (volumePercentage >= 80)
-            {
-                strip.setPixelColor(i, 0, 255, 0);
-            }
-            else if (volumePercentage >= 50)
-            {
-                strip.setPixelColor(i, 255, 255, 0);
-            }
-            else if (volumePercentage >= 30)
-            {
-                strip.setPixelColor(i, 255, 0, 255);
-            }
-            else
-            {
-                strip.setPixelColor(i, 0, 0, 255);
-            }
-        }
-        else
-        {
-            strip.setPixelColor(i, 0, 0, 0);
-        }
-    }
+	//micValue = map(analogRead(MICPIN), 0, 513, 0, NUMPIXELS);
 
-    strip.show();
-    //delay(500);
+	for (int i = 0; i < NUMPIXELS; i++)
+	{
+		volumePercentage = map(i, 0, NUMPIXELS, 0, 100);
+		if (i < micValue)
+		{
+			if (volumePercentage >= 80)
+			{
+				strip.setPixelColor(i, 0, 255, 0);
+			}
+			else if (volumePercentage >= 50)
+			{
+				strip.setPixelColor(i, 255, 255, 0);
+			}
+			else if (volumePercentage >= 30)
+			{
+				strip.setPixelColor(i, 255, 0, 255);
+			}
+			else
+			{
+				strip.setPixelColor(i, 0, 0, 255);
+			}
+		}
+		else
+		{
+			strip.setPixelColor(i, 0, 0, 0);
+		}
+	}
+
+	strip.show();
+	//delay(500);
 }
