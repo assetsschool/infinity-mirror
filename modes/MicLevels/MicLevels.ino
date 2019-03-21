@@ -24,6 +24,10 @@ Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_
 
 int micValue = 0;
 int volumePercentage = 0;
+
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;
+
 void setup()
 {
 
@@ -44,17 +48,43 @@ void setup()
 void loop()
 {
 
-    micValue = map(analogRead(MICPIN), 0, 513, 0, NUMPIXELS);
+    unsigned long startMillis = millis(); // Start of sample window
+    unsigned int peakToPeak = 0;          // peak-to-peak level
 
-    volumePercentage = map(micValue, 0, NUMPIXELS, 0, 100);
+    unsigned int signalMax = 0;
+    unsigned int signalMin = 1024;
+
+    // collect data for 50 mS
+    while (millis() - startMillis < sampleWindow)
+    {
+        sample = analogRead(0);
+        if (sample < 1024) // toss out spurious readings
+        {
+            if (sample > signalMax)
+            {
+                signalMax = sample; // save just the max levels
+            }
+            else if (sample < signalMin)
+            {
+                signalMin = sample; // save just the min levels
+            }
+        }
+    }
+    peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
+                                        //double volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+
+    micValue = map(peakToPeak, 0, 512, 0, NUMPIXELS);
+
+    //micValue = map(analogRead(MICPIN), 0, 513, 0, NUMPIXELS);
 
     for (int i = 0; i < NUMPIXELS; i++)
     {
+        volumePercentage = map(i, 0, NUMPIXELS, 0, 100);
         if (i < micValue)
         {
             if (volumePercentage >= 80)
             {
-                strip.setPixelColor(i, 255, 0, 0);
+                strip.setPixelColor(i, 0, 255, 0);
             }
             else if (volumePercentage >= 50)
             {
@@ -62,7 +92,7 @@ void loop()
             }
             else if (volumePercentage >= 30)
             {
-                strip.setPixelColor(i, 0, 255, 0);
+                strip.setPixelColor(i, 255, 0, 255);
             }
             else
             {
@@ -76,5 +106,5 @@ void loop()
     }
 
     strip.show();
-    delay(500);
+    //delay(500);
 }
