@@ -14,6 +14,7 @@
 #define DATAPIN 6	 // Green wire
 #define CLOCKPIN 5	// Blue wire
 #define MICPIN 0
+#define COMPENSATE 20
 
 #define BRIGHTNESS 25
 #define SQUELCH 200
@@ -26,7 +27,9 @@ int micValue = 0;
 int volumePercentage = 0;
 
 const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
-unsigned int sample;
+unsigned int sample = 0;
+unsigned int lastSample = 0;
+unsigned int buffer = 0;
 
 void setup()
 {
@@ -55,26 +58,40 @@ void loop()
 	unsigned int signalMin = 1024;
 
 	// collect data for 50 mS
-	while (millis() - startMillis < sampleWindow)
-	{
-		sample = analogRead(0);
-		if (sample < 1024) // toss out spurious readings
-		{
-			if (sample > signalMax)
-			{
-				signalMax = sample; // save just the max levels
-			}
-			else if (sample < signalMin)
-			{
-				signalMin = sample; // save just the min levels
-			}
-		}
-	}
+	//while (millis() - startMillis < sampleWindow)
+	//{
+		sample = analogRead(MICPIN);
+		//if (sample < 1024) // toss out spurious readings
+		//{
+			// if (sample > signalMax)
+			// {
+			// 	signalMax = sample; // save just the max levels
+			// }
+			// else if (sample < signalMin)
+			// {
+			// 	signalMin = sample; // save just the min levels
+			// }
+			//peakToPeak = sample;
+				if (sample < lastSample) {
+					buffer--;
+				}
+				if (sample > lastSample) {
+					buffer++;
+				}
+				 else {
+					buffer = sample;
+				}
+				lastSample = sample;
+		//} else {
+			//peakToPeak = 1024;
+		//}
+	//}
 
 	// Gets amplitude change
-	peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude 
+	//peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude 
 
-	micValue = map(peakToPeak, 0, 512, 0, NUMPIXELS); // Maps the value to the pixel length
+	//micValue = map(peakToPeak, 0, 512, 0, NUMPIXELS); // Maps the value to the pixel length
+	micValue = map(buffer - COMPENSATE, 0, 512, 0, NUMPIXELS); // Maps the value to the pixel length
 
 	//micValue = map(analogRead(MICPIN), 0, 513, 0, NUMPIXELS);
 
@@ -107,5 +124,5 @@ void loop()
 	}
 
 	strip.show();
-	//delay(500);
+	//delay(10);
 }
